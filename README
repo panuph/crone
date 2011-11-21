@@ -2,7 +2,7 @@ crone: A little extension to cron
 
 INSTALL
 
-python setup.py install
+easy_install crone 
 
 USAGE
 
