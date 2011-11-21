@@ -6,6 +6,6 @@ setup(
     description="A little extension to cron",
     author="Panu P",
     author_email="panuph@gmail.com",
-    url="https://panuph@github.com/panuph/crone.git",
+    url="https://github.com/panuph/crone",
     py_modules=["crone"]
 )
