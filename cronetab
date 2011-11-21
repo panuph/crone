@@ -1,0 +1,2 @@
+*/5 */1 * * * * * * Australia/Melbourne echo "Hello Melbourne!"
+* * * * * 2011-11-15T00:00:00 * 1d Australia/Melbourne echo "Hello Melbourne!"

@@ -1,0 +1,33 @@
+crone: A little extension to cron
+
+INSTALL
+
+python setup.py install
+
+USAGE
+
+Like cron, but you have more flexibility to scope down the time you want your
+commands executed. First of all, you have to ask cron to run crone.py every
+minute with something like:
+
+* * * * * python -m crone -p cronetab > crone.log 2>&1
+
+In your cronetab file, you specify crone (cron with extension) tasks, like:
+
+* * * * * * * * * echo "Hello World!"
+          | | | |
+          | | |  --> timezone, e.g. Australia/Melbourne and UTC (* = UTC)
+          | | --> interval from begin, e.g. 7d and 14d (* = 1d)
+          | --> end period, e.g. 2011-11-11T11:11:11 (* = 2099-12-31T23:59:59)
+          --> begin period, e.g. 2011-11-11T11:11:11 (* = 2000-01-01T00:00:00)
+
+The first five conditions are exactly like cron. The latter fours are begin,
+end, interval and timezone, and with this extension a command is executed iff
+the current time at the given timezone is within the period, i.e. begin to
+end exclusively, and falls within the interval -- note that only day intervals
+is supported at the moment.
+
+DEPENDENCIES
+
+pyparsing
+dateutil
