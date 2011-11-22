@@ -29,7 +29,27 @@ iff the current time at the given timezone is within the period, i.e. begin to
 end inclusively, and falls within the interval -- note that only day intervals
 is supported at the moment.
 
+To see all possible arguments, run python -m crone -h and you will get:
+
+Usage: crone.pyc [options]
+
+Options:
+  -h, --help            show this help message and exit
+  -p PATH, --path=PATH  path to the crontab file (required)
+  -t TZPATH, --tzpath=TZPATH
+                        path to the timezone directory (default is
+                        /usr/share/zoneinfo)
+
+You use -p to indicate the absolute path to your crontab file, and you use -t
+to indicate the absolute path to the directory that contains timezone data. On
+my machine, it is /usr/share/zoneinfo, so it is default in crone.
+
 DEPENDENCIES
 
-pyparsing
-dateutil
+pyparsing (easy_install pyparsing)
+dateutil (easy_install python-dateutil)
+
+CONTACT
+
+If you have suggestions, reqeusts, etc, please feel free to create an issue in
+GitHub. Pull requests are also very much welcome.
