@@ -26,7 +26,7 @@ supported. At the moment, something like 1, 1,2,3, 0-10, * and */2, including
 all of them combined like 1,2,*,*/5,2-9 should work. The last fours are begin,
 end, interval and timezone, and subject to this extension a command is executed 
 iff the current time at the given timezone is within the period, i.e. begin to
-end exclusively, and falls within the interval -- note that only day intervals
+end inclusively, and falls within the interval -- note that only day intervals
 is supported at the moment.
 
 DEPENDENCIES
