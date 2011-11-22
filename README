@@ -29,10 +29,12 @@ iff the current time at the given timezone is within the period, i.e. begin to
 end inclusively, and falls within the interval -- note that only day intervals
 is supported at the moment and the format of time is YYYY-mm-ddTHH:MM:SS.
 
-More examples of cronetab entries are shown below.
+More examples of cronetab entries are shown below. Note that an entry prefixed
+with # will never ever be executed.
 
 */5 */1 * * * * * * Australia/Melbourne echo "Hello Melbourne!"
 * * * * * 2011-11-15T00:00:00 * 1d Australia/Melbourne echo "Hello Melbourne!"
+#* * * * * * * * echo "Hello Melbourne!"
 
 To see all possible arguments, run python -m crone -h and you will see:
 

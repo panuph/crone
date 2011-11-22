@@ -65,11 +65,15 @@ def main(utcnow):
 
     # process each line of command
     with open(options.path) as fd:
-        for line in fd:
+        log.info("<<<<< BEGIN >>>>>")
+        for i, line in enumerate(fd):
             try:
-                log.info("--- begin ---")
-                # prepare the input line
+                log.info("--- begin job %d ---", i + 1)
+                # prepare the input line and skip if commented.
                 log.info("input is %s", line.rstrip())
+                if line.lstrip().startswith("#"):
+                    log.info("skip this job as it is commented")
+                    continue
                 tokens = line.split()
                 # check the path to the specified timezone
                 tzfile = os.path.join(options.tzpath, timezone(tokens[8]))
@@ -114,7 +118,8 @@ def main(utcnow):
             except:
                 log.exception("unexpected error, see traces below")
             finally:
-                log.info("---- end ----")
+                log.info("--- end job %d ---", i + 1)
+        log.info("<<<<<  END  >>>>>")
 
 if __name__ == "__main__":
     utcnow = dt.datetime.now(tz.tzutc())
