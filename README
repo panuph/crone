@@ -27,9 +27,14 @@ all of them combined like 1,2,*,*/5,2-9 should work. The last fours are begin,
 end, interval and timezone, and subject to this extension a command is executed 
 iff the current time at the given timezone is within the period, i.e. begin to
 end inclusively, and falls within the interval -- note that only day intervals
-is supported at the moment.
+is supported at the moment and the format of time is YYYY-mm-ddTHH:MM:SS.
 
-To see all possible arguments, run python -m crone -h and you will get:
+More examples of cronetab entries are shown below.
+
+*/5 */1 * * * * * * Australia/Melbourne echo "Hello Melbourne!"
+* * * * * 2011-11-15T00:00:00 * 1d Australia/Melbourne echo "Hello Melbourne!"
+
+To see all possible arguments, run python -m crone -h and you will see:
 
 Usage: crone.pyc [options]
 
@@ -40,7 +45,7 @@ Options:
                         path to the timezone directory (default is
                         /usr/share/zoneinfo)
 
-You use -p to indicate the absolute path to your crontab file, and you use -t
+You use -p to indicate the absolute path to your cronetab file, and you use -t
 to indicate the absolute path to the directory that contains timezone data. On
 my machine, it is /usr/share/zoneinfo, so it is default in crone.
 
