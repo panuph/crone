@@ -2,7 +2,15 @@ crone: A little extension to cron
 
 INSTALL
 
-easy_install crone OR python setup.py install
+1. Download the source distribution
+2. Untar/unzip the source distribution
+3. Run python setup.py install
+*** the module will appear as an editable source file in site-packages.
+
+or
+
+1. Run easy_install crone
+*** the module will appear as an uneditable binary file in site-packages.
 
 USAGE
 
