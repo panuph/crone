@@ -68,3 +68,9 @@ CONTACT
 
 If you have suggestions, reqeusts, etc, please feel free to create an issue in
 GitHub. Pull requests are also very much welcome.
+
+RELEASE NOTE
+
+1.0.0: Initial release.
+1.0.1: Add more information, instruction, etc.
+1.0.2: Fix issues #1-#2 (mostly adding unit testing).

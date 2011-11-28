@@ -9,59 +9,69 @@ from optparse import OptionParser
 def range_parser(pattern, begin, end):
     """Builds parser for something like: 1,2,3-5,*/2,*"""
     atom = Combine(Regex(pattern) + "-" + Regex(pattern)).setParseAction(
-               lambda s, l, t: list(range(*map(int, t[0].split("-"))))) | \
+               lambda s, l, t: list(range(int(t[0].split("-")[0]), int(t[0].split("-")[1]) + 1))) | \
            Regex(pattern).setParseAction(
                lambda s, l, t: [int(t[0])]) | \
-           (Literal("*/").suppress() + Word(nums).setParseAction(
-               lambda s, l, t: list(range(begin, end+1, int(t[0]))))) | \
+           Combine(Literal("*/").suppress() + Word(nums)).setParseAction(
+               lambda s, l, t: list(range(begin, end + 1, int(t[0])))) | \
            Literal("*").setParseAction(
-               lambda s, l, t: list(range(begin, end+1)))
-    return (atom + ZeroOrMore(Literal(",").suppress() + atom)).setParseAction(
+               lambda s, l, t: list(range(begin, end + 1)))
+    return (StringStart() + atom + ZeroOrMore(Literal(",").suppress() + atom) + StringEnd()).setParseAction(
         lambda s, l, t: sorted(list(set(t))))
 
 def datetime_parser(default):
     """Builds parser for datetime in format: YYYY-mm-ddTHH:MM:SS"""
     pattern = r"20\d{2}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
     format = "%Y-%m-%dT%H:%M:%S"
-    return Regex(pattern).setParseAction(
+    atom = Regex(pattern).setParseAction(
                lambda s, l, t: dt.datetime.strptime(t[0], format)) | \
            Literal("*").setParseAction(
                lambda: dt.datetime.strptime(default, format))
+    return StringStart() + atom + StringEnd()
 
 def interval_parser(default=1):
     """Builds parser for interval like: 1d"""
-    return Combine(Word(nums) + "d").setParseAction(
+    atom = Combine(Word(nums) + "d").setParseAction(
                lambda s, l, t: int(t[0][:-1])) | \
            Literal("*").setParseAction(
                lambda: default)
+    return StringStart() + atom + StringEnd()
 
-def timezone_parser(default="UCT"):
+def timezone_parser(default="UTC"):
     """Builds parser for timezone like: Melbourne/Australia, UTC"""
-    return Word(alphanums + "/") | Literal("*").setParseAction(lambda: default)
+    atom = Word(alphanums + "/") | \
+           Literal("*").setParseAction(lambda: default)
+    return StringStart() + atom + StringEnd()
+
+def build_parsers():
+    """Builds all required, ready-to-use parsing functions (in order)."""
+    return (
+        lambda x: list(range_parser(r"[0-5][0-9]|[0-9]", 0, 59).parseString(x)),
+        lambda x: list(range_parser(r"2[0123]|[0-1]?[0-9]", 0, 23).parseString(x)),
+        lambda x: list(range_parser(r"3[01]|[1-2][0-9]|0?[1-9]", 1, 31).parseString(x)),
+        lambda x: list(range_parser(r"1[012]|[0]?[1-9]", 1, 12).parseString(x)),
+        lambda x: list(range_parser(r"[0-6]", 0, 6).parseString(x)),
+        lambda x: datetime_parser("2000-01-01T00:00:00").parseString(x)[0],
+        lambda x: datetime_parser("2099-12-31T23:59:59").parseString(x)[0],
+        lambda x: interval_parser().parseString(x)[0],
+        lambda x: timezone_parser().parseString(x)[0]
+    )
 
 def main(utcnow):
     parser = OptionParser("%prog [options]")
     parser.add_option("-p", "--path", 
         dest="path", default=None,
-        help="path to the crontab file (required)")
+        help="path to the cronetab file (required)")
     parser.add_option("-t", "--tzpath", 
         dest="tzpath", default="/usr/share/zoneinfo",
         help="path to the timezone directory (default is /usr/share/zoneinfo)")
     (options, args) = parser.parse_args()
 
     if not options.path or not os.path.exists(options.path):
-        raise AssertionError("crontab file %s not found" % options.path)
+        raise AssertionError("cronetab file %s not found" % options.path)
 
     # build parsing functions
-    minute = lambda x: list(range_parser(r"[0-5][0-9]|[0-9]", 0, 59).parseString(x))
-    hour = lambda x: list(range_parser(r"2[0123]|[0-1]?[0-9]", 0, 23).parseString(x))
-    date = lambda x: list(range_parser(r"3[01]|[1-2][0-9]|0?[1-9]", 1, 31).parseString(x))
-    month = lambda x: list(range_parser(r"1[012]|[0]?[1-9]", 1, 12).parseString(x))
-    day = lambda x: list(range_parser(r"[0-6]", 0, 6).parseString(x))
-    begin = lambda x: datetime_parser("2000-01-01T00:00:00").parseString(x)[0]
-    end = lambda x: datetime_parser("2099-12-31T23:59:59").parseString(x)[0]
-    interval = lambda x: interval_parser().parseString(x)[0]
-    timezone = lambda x: timezone_parser().parseString(x)[0]
+    (minute, hour, date, month, day, begin, end, interval, timezone) = build_parsers()
 
     # process each line of command
     with open(options.path) as fd:
