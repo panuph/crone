@@ -69,7 +69,7 @@ to indicate the absolute path to the directory that contains timezone data. See
 http://www.linuxsa.org.au/tips/time.html for information about this topic. On
 my machine, the directory is /usr/share/zoneinfo, so it is default in crone. By
 default, crone executes commands in order, waiting for each to complete before
-executing the next. If you flag --concurrent, crone will executes commands in
+executing the next. If you flag --concurrent, crone will execute commands in
 concurrent manner.
 
 DEPENDENCIES
