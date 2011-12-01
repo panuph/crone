@@ -8,7 +8,7 @@ setup(
     maintainer="Panu P",
     maintainer_email="panuph@gmail.com",
     url="https://github.com/panuph/crone",
-    description="A little extension to cron",
+    description="A little extension to cron with timezone support",
     long_description=open("README").read(),
     download_url="https://github.com/panuph/crone/downloads",
     classifiers=["Programming Language :: Python", "Operating System :: POSIX"],
