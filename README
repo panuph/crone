@@ -62,7 +62,7 @@ Options:
   -t TZPATH, --tzpath=TZPATH
                         path to the timezone directory (default is
                         /usr/share/zoneinfo)
-  --concurrent          run commands concurrentl (default if False)
+  --concurrent          run commands concurrently (default if False)
 
 You use -p to indicate the absolute path to your cronetab file, and you use -t
 to indicate the absolute path to the directory that contains timezone data. See
