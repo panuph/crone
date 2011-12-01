@@ -1,4 +1,5 @@
 import os
+import threading
 import subprocess
 import datetime as dt
 import logging as log
@@ -29,18 +30,22 @@ def datetime_parser(default):
                lambda: dt.datetime.strptime(default, format))
     return StringStart() + atom + StringEnd()
 
-def interval_parser(default=1):
+def interval_parser(default=("d", 1)):
     """Builds parser for interval like: 1d"""
     atom = Combine(Word(nums) + "d").setParseAction(
-               lambda s, l, t: int(t[0][:-1])) | \
+               lambda s, l, t: ("d", int(t[0][:-1]))) | \
+           Combine(Word(nums) + "h").setParseAction(
+               lambda s, l, t: ("h", int(t[0][:-1]))) | \
+           Combine(Word(nums) + "m").setParseAction(
+               lambda s, l, t: ("m", int(t[0][:-1]))) | \
            Literal("*").setParseAction(
                lambda: default)
     return StringStart() + atom + StringEnd()
 
 def timezone_parser(default="UTC"):
     """Builds parser for timezone like: Melbourne/Australia, UTC"""
-    atom = Word(alphanums + "/") | \
-           Literal("*").setParseAction(lambda: default)
+    atom = Literal("*").setParseAction(lambda: default) | \
+           Regex(".+")
     return StringStart() + atom + StringEnd()
 
 def build_parsers():
@@ -57,14 +62,29 @@ def build_parsers():
         lambda x: timezone_parser().parseString(x)[0]
     )
 
+def total_seconds(td):     
+    """Copied directly from python 2.7 datetime.timedelta.total_seconds()."""
+    return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
+
+def exec_command(command, as_thread=False):
+    """Executes the command, can be sequentially or concurrently."""
+    if as_thread:
+        threading.Thread(target=subprocess.check_call, args=(command,), 
+            kwargs=dict(shell=True)).start()
+    else:
+        subprocess.check_call(command, shell=True)
+
 def main(utcnow):
     parser = OptionParser("%prog [options]")
     parser.add_option("-p", "--path", 
-        dest="path", default=None,
-        help="path to the cronetab file (required)")
+        dest="path", default=os.path.join(os.path.expanduser("~"), ".cronetab"),
+        help="path to the cronetab file (default is ~/.cronetab)")
     parser.add_option("-t", "--tzpath", 
         dest="tzpath", default="/usr/share/zoneinfo",
         help="path to the timezone directory (default is /usr/share/zoneinfo)")
+    parser.add_option("--concurrent",
+        dest="concurrent", default=False, action="store_true",
+        help="run commands concurrently (default if False)")
     (options, args) = parser.parse_args()
 
     if not options.path or not os.path.exists(options.path):
@@ -118,13 +138,24 @@ def main(utcnow):
                     log.debug("fail to meet period condition")
                     continue
                 # check the interval condition
-                if (now.date() - begin(tokens[5]).date()).days % interval(tokens[7]):
-                    log.debug("fail to meet interval condition")
-                    continue
+                (key, value) = interval(tokens[7])
+                diff = total_seconds(now - begin(tokens[5]))
+                if key == "d":
+                    if (diff / 86400) % value:
+                        log.debug("fail to meet day interval condition")
+                        continue
+                elif key == "h":
+                    if (diff / 3600) % value:
+                        log.debug("fail to meet hour interval condition")
+                        continue
+                elif key == "m":
+                    if (diff / 60) % value:
+                        log.debug("fail to meet minute interval condition")
+                        continue
                 # execute the command
                 command = " ".join(tokens[9:])
-                log.info("execute command %s", command)
-                subprocess.check_call(command, shell=True)
+                log.info("executing command %s", command)
+                exec_command(command, as_thread=options.concurrent)
             except:
                 log.exception("unexpected error, see traces below")
             finally:

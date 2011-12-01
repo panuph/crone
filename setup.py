@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name="crone",
-    version="1.0.2",
+    version="1.0.3",
     author="Panu P",
     author_email="panuph@gmail.com",
     maintainer="Panu P",
