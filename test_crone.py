@@ -115,14 +115,19 @@ class TestFunctions(unittest.TestCase):
     def test_interval_parser(self):
         parse = crone.build_parsers()[7]
 
-        self.assertEqual(7, parse("7d"))
-        self.assertEqual(1, parse("*"))
+        self.assertEqual(("d", 7), parse("7d"))
+        self.assertEqual(("h", 7), parse("7h"))
+        self.assertEqual(("m", 7), parse("7m"))
+        self.assertEqual(("d", 1), parse("*"))
 
+        self.assertRaises(Exception, parse, "7s")
         self.assertRaises(Exception, parse, "XXX")
 
     def test_timezone_parser(self):
         parse = crone.build_parsers()[8]
 
+        self.assertEqual("GMT+7", parse("GMT+7"))
+        self.assertEqual("A-B.C", parse("A-B.C"))
         self.assertEqual("Australia/Melbourne", parse("Australia/Melbourne"))
         self.assertEqual("UTC", parse("*"))
 

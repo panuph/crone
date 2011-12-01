@@ -1,4 +1,10 @@
-crone: A little extension to cron
+crone: a little extension to cron
+
+OVERVIEW
+
+Like cron, but you can further indicate the timezone, the period and interval 
+to run a command (tested on python 2.6 but should be fine to run with older 
+python release). See USAGE for more detailed information.
 
 INSTALL
 
@@ -32,10 +38,11 @@ In your cronetab file, you specify crone (cron with extension) tasks, like:
 The first five conditions are exactly like cron. However, not all formats are
 supported. At the moment, something like 1, 1,2,3, 0-10, * and */2, including
 all of them combined like 1,2,*,*/5,2-9 should work. The last fours are begin,
-end, interval and timezone, and subject to this extension a command is executed 
-iff the current time at the given timezone is within the period, i.e. begin to
-end inclusively, and falls within the interval -- note that only day intervals
-is supported at the moment and the format of time is YYYY-mm-ddTHH:MM:SS.
+end, interval (calculated from begin) and timezone conditions. Subject to this
+extension a command is executed iff the current time in the given timezone is 
+within the period, i.e. begin to end (specified in format YYYY-mm-ddTHH:MM:SS) 
+inclusively, and falls within the interval -- either day e.g. 7d, hour e.g. 7h 
+or mintue e.g. 7m.
 
 More examples of cronetab entries are shown below. Note that an entry prefixed
 with # will never ever be executed.
@@ -44,20 +51,26 @@ with # will never ever be executed.
 * * * * * 2011-11-15T00:00:00 * 1d Australia/Melbourne echo "Hello Melbourne!"
 #* * * * * * * * * echo "Hello Melbourne!"
 
-To see all possible arguments, run python -m crone -h and you will see:
+To view all possible arguments, you run python -m crone -h and will see things
+similar to below:
 
-Usage: crone.pyc [options]
+Usage: crone.py [options]
 
 Options:
   -h, --help            show this help message and exit
-  -p PATH, --path=PATH  path to the crontab file (required)
+  -p PATH, --path=PATH  path to the cronetab file (default is ~/.cronetab)
   -t TZPATH, --tzpath=TZPATH
                         path to the timezone directory (default is
                         /usr/share/zoneinfo)
+  --concurrent          run commands concurrentl (default if False)
 
 You use -p to indicate the absolute path to your cronetab file, and you use -t
-to indicate the absolute path to the directory that contains timezone data. On
-my machine, it is /usr/share/zoneinfo, so it is default in crone.
+to indicate the absolute path to the directory that contains timezone data. See
+http://www.linuxsa.org.au/tips/time.html for information about this topic. On
+my machine, the directory is /usr/share/zoneinfo, so it is default in crone. By
+default, crone executes commands in order, waiting for each to complete before
+executing the next. If you flag --concurrent, crone will executes commands in
+concurrent manner.
 
 DEPENDENCIES
 
