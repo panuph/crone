@@ -51,8 +51,8 @@ with # will never ever be executed.
 * * * * * 2011-11-15T00:00:00 * 1d Australia/Melbourne echo "Hello Melbourne!"
 #* * * * * * * * * echo "Hello Melbourne!"
 
-To see all possible arguments, you run python -m crone -h and will get somethig
-like below:
+To view all possible arguments, you run python -m crone -h and will see things
+similar to below:
 
 Usage: crone.py [options]
 
