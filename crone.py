@@ -84,7 +84,7 @@ def main(utcnow):
         help="path to the timezone directory (default is /usr/share/zoneinfo)")
     parser.add_option("--concurrent",
         dest="concurrent", default=False, action="store_true",
-        help="run commands concurrently (default if False)")
+        help="run commands concurrently (default is False)")
     (options, args) = parser.parse_args()
 
     if not options.path or not os.path.exists(options.path):
