@@ -1,11 +1,13 @@
-import os
-import threading
-import subprocess
 import datetime as dt
 import logging as log
+import os
+import subprocess
+import threading
+from optparse import OptionParser
+
 from dateutil import tz
 from pyparsing import *
-from optparse import OptionParser
+
 
 def range_parser(pattern, begin, end):
     """Builds parser for something like: 1,2,3-5,*/2,*"""
@@ -20,8 +22,9 @@ def range_parser(pattern, begin, end):
     return (StringStart() + atom + ZeroOrMore(Literal(",").suppress() + atom) + StringEnd()).setParseAction(
         lambda s, l, t: sorted(list(set(t))))
 
+
 def datetime_parser(default):
-    """Builds parser for datetime in format: YYYY-mm-ddTHH:MM:SS"""
+    """Builds parser for datetime in format: YYYY-mm-ddTHH:MM:SS."""
     pattern = r"20\d{2}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
     format = "%Y-%m-%dT%H:%M:%S"
     atom = Regex(pattern).setParseAction(
@@ -31,7 +34,7 @@ def datetime_parser(default):
     return StringStart() + atom + StringEnd()
 
 def interval_parser(default=("d", 1)):
-    """Builds parser for interval like: 1d"""
+    """Builds parser for interval like: 1d."""
     atom = Combine(Word(nums) + "d").setParseAction(
                lambda s, l, t: ("d", int(t[0][:-1]))) | \
            Combine(Word(nums) + "h").setParseAction(
@@ -43,7 +46,7 @@ def interval_parser(default=("d", 1)):
     return StringStart() + atom + StringEnd()
 
 def timezone_parser(default="UTC"):
-    """Builds parser for timezone like: Melbourne/Australia, UTC"""
+    """Builds parser for timezone like: Melbourne/Australia, UTC."""
     atom = Literal("*").setParseAction(lambda: default) | \
            Regex(".+")
     return StringStart() + atom + StringEnd()
@@ -62,24 +65,24 @@ def build_parsers():
         lambda x: timezone_parser().parseString(x)[0]
     )
 
-def total_seconds(td):     
+def total_seconds(td):
     """Copied directly from python 2.7 datetime.timedelta.total_seconds()."""
     return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
 
 def exec_command(command, as_thread=False):
     """Executes the command, can be sequentially or concurrently."""
     if as_thread:
-        threading.Thread(target=subprocess.check_call, args=(command,), 
+        threading.Thread(target=subprocess.check_call, args=(command,),
             kwargs=dict(shell=True)).start()
     else:
         subprocess.check_call(command, shell=True)
 
 def main(utcnow):
     parser = OptionParser("%prog [options]")
-    parser.add_option("-p", "--path", 
+    parser.add_option("-p", "--path",
         dest="path", default=os.path.join(os.path.expanduser("~"), ".cronetab"),
         help="path to the cronetab file (default is ~/.cronetab)")
-    parser.add_option("-t", "--tzpath", 
+    parser.add_option("-t", "--tzpath",
         dest="tzpath", default="/usr/share/zoneinfo",
         help="path to the timezone directory (default is /usr/share/zoneinfo)")
     parser.add_option("--concurrent",
@@ -164,7 +167,7 @@ def main(utcnow):
 
 if __name__ == "__main__":
     utcnow = dt.datetime.now(tz.tzutc())
-    log.basicConfig(format="%(asctime)s %(message)s", level=log.DEBUG)    
+    log.basicConfig(format="%(asctime)s %(message)s", level=log.DEBUG)
     try:
         main(utcnow)
     except AssertionError, ex:
