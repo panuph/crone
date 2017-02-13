@@ -33,6 +33,7 @@ def datetime_parser(default):
                lambda: dt.datetime.strptime(default, format))
     return StringStart() + atom + StringEnd()
 
+
 def interval_parser(default=("d", 1)):
     """Builds parser for interval like: 1d."""
     atom = Combine(Word(nums) + "d").setParseAction(
@@ -45,11 +46,13 @@ def interval_parser(default=("d", 1)):
                lambda: default)
     return StringStart() + atom + StringEnd()
 
+
 def timezone_parser(default="UTC"):
     """Builds parser for timezone like: Melbourne/Australia, UTC."""
     atom = Literal("*").setParseAction(lambda: default) | \
            Regex(".+")
     return StringStart() + atom + StringEnd()
+
 
 def build_parsers():
     """Builds all required, ready-to-use parsing functions (in order)."""
@@ -65,9 +68,11 @@ def build_parsers():
         lambda x: timezone_parser().parseString(x)[0]
     )
 
+
 def total_seconds(td):
     """Copied directly from python 2.7 datetime.timedelta.total_seconds()."""
     return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
+
 
 def exec_command(command, as_thread=False):
     """Executes the command, can be sequentially or concurrently."""
@@ -77,6 +82,7 @@ def exec_command(command, as_thread=False):
     else:
         subprocess.check_call(command, shell=True)
 
+        
 def main(utcnow):
     parser = OptionParser("%prog [options]")
     parser.add_option("-p", "--path",
@@ -164,6 +170,7 @@ def main(utcnow):
             finally:
                 log.info("--- end job %d ---", i + 1)
         log.info("<<<<<  END  >>>>>")
+
 
 if __name__ == "__main__":
     utcnow = dt.datetime.now(tz.tzutc())
